@@ -56,4 +56,6 @@ class ServicioAdmin(ModelAdmin):
 
     @admin.display(description="Precio", ordering="precio")
     def precio_fmt(self, obj):
+        if obj.precio is None:
+            return "A consultar"
         return f"${obj.precio:,.0f} {obj.get_unidad_precio_display()}"
