@@ -17,14 +17,26 @@ SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-only")
 # DEBUG booleano desde env
 DEBUG = os.getenv("DEBUG", "0").lower() in ("1", "true", "yes", "on")
 
-# ALLOWED_HOSTS configurable por env; auto-incluye dominio de Railway
+# ALLOWED_HOSTS configurable por env; auto-incluye los dominios de Railway.
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()]
+
+# Dominio de producción propio (siempre permitido, sin depender de la env var).
+ALLOWED_HOSTS += ["viajesventasyturismotolu.com", "www.viajesventasyturismotolu.com"]
+
+# Railway: dominio público generado (variable inyectada por la plataforma) y,
+# como red de seguridad, cualquier subdominio *.railway.app / *.up.railway.app.
 _railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
 if _railway_domain:
     ALLOWED_HOSTS.append(_railway_domain)
-if not ALLOWED_HOSTS:
-    # Fallback abierto solo en desarrollo
-    ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS += [".railway.app", ".up.railway.app"]
+
+# Desarrollo local: con DEBUG=True permite localhost/127.0.0.1.
+if DEBUG:
+    ALLOWED_HOSTS += ["localhost", "127.0.0.1", "[::1]"]
+
+# Detrás del proxy de Railway: respeta el esquema https reenviado por el proxy
+# (necesario para CSRF, cookies seguras y request.is_secure()).
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # Application definition
@@ -121,10 +133,16 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# Orígenes de confianza para CSRF (sin barra final ni ruta: solo esquema://host).
 CSRF_TRUSTED_ORIGINS = [
-        "https://chase-nondrinkable-editorially.ngrok-free.dev",
-        "https://viajesventasyturismotolu.com"
-    ]
+    "https://chase-nondrinkable-editorially.ngrok-free.dev",
+    "https://viajesventasyturismotolu.com",
+    "https://www.viajesventasyturismotolu.com",
+    "https://*.railway.app",
+    "https://*.up.railway.app",
+]
+if _railway_domain:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{_railway_domain}")
 
 # Internationalization
 LANGUAGE_CODE = 'es-co'
