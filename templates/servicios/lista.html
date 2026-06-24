@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load servicios_extras %}
+
+{% block content %}
+<section class="bg-gradient-to-b from-concha/60 to-arena">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+    <p class="eyebrow">Catálogo</p>
+    <h1 class="mt-2 font-display text-3xl sm:text-4xl font-extrabold text-mar">
+      {% if filtros.tipo == 'hotel' %}Hoteles en Tolú{% elif filtros.tipo == 'lancha' %}Lanchas y tours{% else %}Hoteles y lanchas en Tolú{% endif %}
+    </h1>
+    <p class="mt-2 text-niebla">Filtra por tipo{% if hay_con_precio %}, precio{% endif %} y lugar para encontrar tu plan en el Golfo de Morrosquillo.</p>
+  </div>
+</section>
+
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:grid lg:grid-cols-[280px_1fr] lg:gap-8">
+
+  <!-- ====== Filtros ====== -->
+  <aside x-data="{ panel: false }" class="mb-6 lg:mb-0">
+    <button @click="panel = !panel" class="lg:hidden w-full mb-3 inline-flex items-center justify-center gap-2 rounded-xl border border-concha bg-white px-4 py-3 font-semibold">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M3 6h18M6 12h12m-9 6h6"/></svg>
+      Filtros
+    </button>
+
+    <form method="get" action="{% url 'servicios:lista' %}"
+          hx-get="{% url 'servicios:lista' %}" hx-target="#resultados" hx-push-url="true"
+          hx-trigger="change, submit"
+          x-show="panel || window.innerWidth >= 1024" x-cloak
+          class="lg:!block rounded-2xl border border-concha bg-white p-5 space-y-6 lg:sticky lg:top-24">
+
+      <fieldset>
+        <legend class="eyebrow mb-3">Tipo</legend>
+        <div class="space-y-1.5">
+          {% for valor, etiqueta in tipos %}
+          <label class="flex items-center gap-2.5 cursor-pointer text-sm">
+            <input type="radio" name="tipo" value="{{ valor }}" {% if filtros.tipo == valor %}checked{% endif %}
+                   class="accent-turquesa w-4 h-4"> {{ etiqueta }}
+          </label>
+          {% endfor %}
+          <label class="flex items-center gap-2.5 cursor-pointer text-sm">
+            <input type="radio" name="tipo" value="" {% if not filtros.tipo %}checked{% endif %} class="accent-turquesa w-4 h-4"> Todos
+          </label>
+        </div>
+      </fieldset>
+
+      {% if hay_con_precio %}
+      <fieldset x-data="{ consultar: {% if filtros.precio == 'consultar' %}true{% else %}false{% endif %} }">
+        <legend class="eyebrow mb-3">Precio (COP)</legend>
+        <div class="flex items-center gap-2" :class="consultar && 'opacity-40 pointer-events-none'">
+          <input type="number" name="precio_min" inputmode="numeric" min="0" placeholder="mín" value="{{ filtros.precio_min }}"
+                 class="w-full rounded-lg border border-concha px-3 py-2 text-sm focus:border-turquesa focus:outline-none">
+          <span class="text-niebla">—</span>
+          <input type="number" name="precio_max" inputmode="numeric" min="0" placeholder="máx" value="{{ filtros.precio_max }}"
+                 class="w-full rounded-lg border border-concha px-3 py-2 text-sm focus:border-turquesa focus:outline-none">
+        </div>
+        {% if rango.min is not None %}<p class="coord text-niebla mt-2" :class="consultar && 'opacity-40'">Rango: {{ rango.min|pesos }} – {{ rango.max|pesos }}</p>{% endif %}
+        {% if hay_sin_precio %}
+        <label class="mt-3 flex items-center gap-2.5 cursor-pointer text-sm">
+          <input type="checkbox" name="precio" value="consultar" x-model="consultar"
+                 {% if filtros.precio == 'consultar' %}checked{% endif %} class="accent-turquesa w-4 h-4">
+          Solo «precio a consultar»
+        </label>
+        {% endif %}
+      </fieldset>
+      {% endif %}
+
+      <fieldset>
+        <legend class="eyebrow mb-3">Lugar</legend>
+        <select name="lugar" class="w-full rounded-lg border border-concha px-3 py-2 text-sm focus:border-turquesa focus:outline-none">
+          <option value="">Cualquier lugar</option>
+          {% for l in lugares %}<option value="{{ l }}" {% if filtros.lugar == l %}selected{% endif %}>{{ l }}</option>{% endfor %}
+        </select>
+      </fieldset>
+
+      <input type="hidden" name="orden" value="{{ filtros.orden }}">
+
+      <div class="flex gap-2 pt-1">
+        <button type="submit" class="flex-1 rounded-xl bg-mar px-4 py-2.5 text-sm font-semibold text-white hover:bg-mar-900 transition-colors">Aplicar</button>
+        <a href="{% url 'servicios:lista' %}" class="rounded-xl border border-concha px-4 py-2.5 text-sm font-semibold text-niebla hover:text-carbon transition-colors">Limpiar</a>
+      </div>
+    </form>
+  </aside>
+
+  <!-- ====== Resultados ====== -->
+  <div id="resultados">
+    {% include "servicios/_grilla.html" %}
+  </div>
+</div>
+{% endblock %}

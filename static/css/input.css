@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+/* Tailwind escanea estas fuentes en busca de clases utilizadas. */
+@source "../../templates/**/*.html";
+@source "../../static/js/**/*.js";
+
+/* ------------------------------------------------------------------
+   Sistema de tokens — Tolú / Golfo de Morrosquillo
+   Paleta costera con identidad propia (no plantillera):
+   mar = agua profunda del golfo · turquesa = agua de orilla
+   sol = atardecer de Tolú (color firma) · concha = arena cálida
+   ------------------------------------------------------------------ */
+@theme {
+  --color-mar: #0a4a5c;
+  --color-mar-900: #082f3a;
+  --color-turquesa: #15a0a6;
+  --color-turquesa-300: #6cdcdf;
+  --color-sol: #ff7a3d;
+  --color-sol-600: #e85f23;
+  --color-concha: #f3e2c7;
+  --color-arena: #fbf7f0;
+  --color-carbon: #0e2a30;
+  --color-niebla: #5b7178;
+
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+
+  --radius-xl2: 1.75rem;
+}
+
+/* Base */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-arena);
+    color: var(--color-carbon);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  /* Foco visible y accesible en todo el sitio */
+  :focus-visible {
+    outline: 2px solid var(--color-sol);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Eyebrow / etiqueta utilitaria en mono (apoya el concepto "carta náutica") */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-turquesa);
+  }
+  .coord {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+  }
+  /* Alto del hero del home (determinista, no depende de utilidades arbitrarias) */
+  .hero-home {
+    min-height: clamp(600px, 88vh, 880px);
+  }
+  @media (max-width: 640px) {
+    .hero-home { min-height: clamp(520px, 82vh, 760px); }
+  }
+  /* Elemento firma: línea de horizonte que separa secciones */
+  .horizonte {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-turquesa-300), transparent);
+  }
+  /* Animación suave de aparición */
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: emerge 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  }
+  @keyframes emerge {
+    to { opacity: 1; transform: none; }
+  }
+  /* Onda animada del hero */
+  @keyframes vaiven {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-24px); }
+  }
+  /* Efecto Ken Burns: zoom/paneo lento sobre la foto activa del hero (firma) */
+  .ken-burns {
+    animation: kenburns 20s ease-in-out infinite alternate;
+    transform-origin: center;
+  }
+  @keyframes kenburns {
+    from { transform: scale(1.05) translate(1%, 0.5%); }
+    to { transform: scale(1.16) translate(-1.5%, -1%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ken-burns { animation: none; }
+  }
+}

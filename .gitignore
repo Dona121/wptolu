@@ -1,0 +1,49 @@
+# ─── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+*.egg-info/
+build/
+dist/
+
+# Caches de herramientas
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# NOTA: uv.lock y .python-version SÍ se versionan (build reproducible).
+
+# ─── Django ───────────────────────────────────────────────
+db.sqlite3
+db.sqlite3-journal
+# Estáticos compilados por collectstatic (se generan en el deploy)
+/staticfiles/
+# Archivos subidos por usuarios (si se habilitan en el futuro)
+/media/
+*.log
+
+# Tailwind standalone CLI (binario; se descarga aparte, ver README)
+tailwindcss.exe
+tailwindcss
+tailwindcss-*
+
+# ─── Entorno / secretos ───────────────────────────────────
+.env
+.env.*
+# Pero conserva la plantilla de ejemplo (sin secretos)
+!.env.example
+
+# ─── Editor / OS ──────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ─── Herramientas de IA ───────────────────────────────────
+.claude/

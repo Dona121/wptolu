@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load servicios_extras %}
+
+{% block content %}
+{% with imagenes=servicio.imagenes.all %}
+<div x-data="galeria({{ imagenes|length }})">
+
+  <!-- Breadcrumb -->
+  <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 text-sm text-niebla" aria-label="Ruta">
+    <ol class="flex flex-wrap items-center gap-1.5">
+      <li><a href="{% url 'home' %}" class="hover:text-turquesa">Inicio</a></li>
+      <li aria-hidden="true">/</li>
+      <li><a href="{% url 'servicios:lista' %}?tipo={{ servicio.tipo }}" class="hover:text-turquesa">{{ servicio.get_tipo_display }}</a></li>
+      <li aria-hidden="true">/</li>
+      <li class="text-carbon font-medium" aria-current="page">{{ servicio.nombre }}</li>
+    </ol>
+  </nav>
+
+  <!-- ====== Galería ====== -->
+  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-5">
+    {% if imagenes %}
+    <div class="grid gap-2.5 md:grid-cols-4 md:grid-rows-2 md:h-[26rem]">
+      {% for img in imagenes|slice:":5" %}
+      <button @click="abrir({{ forloop.counter0 }})"
+              class="group relative overflow-hidden rounded-xl bg-concha
+                     {% if forloop.first %}md:col-span-2 md:row-span-2{% endif %}
+                     {% if not forloop.first %}hidden md:block{% endif %}
+                     {% if forloop.first %}aspect-[4/3] md:aspect-auto{% endif %}">
+        <img src="{{ img.url }}" alt="{{ img.titulo }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+        {% if forloop.counter == 5 and imagenes|length > 5 %}
+        <span class="absolute inset-0 grid place-items-center bg-mar-900/55 text-white font-semibold">+{{ imagenes|length|add:"-5" }} fotos</span>
+        {% endif %}
+      </button>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="h-64 grid place-items-center rounded-xl bg-concha text-niebla">Sin imágenes aún</div>
+    {% endif %}
+  </section>
+
+  <!-- ====== Contenido + panel de reserva ====== -->
+  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 lg:grid lg:grid-cols-[1fr_360px] lg:gap-10 lg:items-start">
+
+    <div>
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-concha px-3 py-1 text-xs font-semibold text-mar">{{ servicio.get_tipo_display }}</span>
+      <h1 class="mt-3 font-display text-3xl sm:text-4xl font-extrabold text-mar">{{ servicio.nombre }}</h1>
+      <p class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-niebla">
+        <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-sol-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 1118 0z"/><circle cx="12" cy="10" r="2.5"/></svg>{{ servicio.lugar }}</span>
+        {% if servicio.capacidad %}<span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-sol-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM3 21a7 7 0 0118 0"/></svg>Hasta {{ servicio.capacidad }} personas</span>{% endif %}
+        {% if servicio.coordenadas %}<span class="coord">{{ servicio.coordenadas }}</span>{% endif %}
+      </p>
+
+      <div class="horizonte my-7"></div>
+
+      <div class="prose-tolu max-w-none whitespace-pre-line text-carbon/90 leading-relaxed">{{ servicio.descripcion }}</div>
+
+      <!-- Video embebido -->
+      {% with videos=servicio.videos.all %}
+      {% if videos %}
+      <div class="mt-10">
+        <h2 class="font-display text-2xl font-bold text-mar mb-4">En video</h2>
+        <div class="space-y-6">
+          {% for v in videos %}
+          <figure>
+            <div class="aspect-video overflow-hidden rounded-2xl bg-mar-900 shadow">
+              <iframe src="{{ v.embed_url }}" title="{{ v.titulo|default:servicio.nombre }}" loading="lazy"
+                      class="h-full w-full" referrerpolicy="strict-origin-when-cross-origin"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            {% if v.titulo %}<figcaption class="mt-2 text-sm text-niebla">{{ v.titulo }}</figcaption>{% endif %}
+          </figure>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {% endwith %}
+    </div>
+
+    <!-- Panel de reserva (sticky) -->
+    <aside class="mt-8 lg:mt-0 lg:sticky lg:top-24">
+      <div class="rounded-2xl border border-concha bg-white p-6 shadow-sm">
+        {% if servicio.precio_a_consultar %}
+        <p class="coord text-niebla">Precio</p>
+        <p class="mt-1 font-mono text-2xl font-bold text-sol-600">A consultar</p>
+        <p class="mt-2 text-sm text-niebla">
+          La tarifa de este servicio es variable. Escríbenos por WhatsApp y te
+          confirmamos el precio según las fechas y el número de personas.
+        </p>
+        {% else %}
+        <p class="coord text-niebla">Precio</p>
+        <p class="mt-1 flex items-baseline gap-2">
+          <span class="font-mono text-3xl font-bold text-mar">{{ servicio.precio|pesos }}</span>
+          <span class="text-niebla">{{ servicio.get_unidad_precio_display }}</span>
+        </p>
+        {% endif %}
+
+        {% if sitio.telefono_whatsapp %}
+        {% if servicio.precio_a_consultar %}
+        <a href="{{ sitio.whatsapp_link }}?text=Hola,%20quiero%20consultar%20el%20precio%20de%20*{{ servicio.nombre|urlencode }}*%20({{ servicio.get_tipo_display|urlencode }})%20en%20{{ servicio.lugar|urlencode }}.%20%C2%BFCu%C3%A1l%20es%20la%20tarifa%3F"
+           target="_blank" rel="noopener"
+           class="mt-5 flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3.5 font-semibold text-white hover:brightness-95 transition">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>
+          Consultar precio por WhatsApp
+        </a>
+        {% else %}
+        <a href="{{ sitio.whatsapp_link }}?text=Hola,%20quiero%20reservar%20*{{ servicio.nombre|urlencode }}*%20({{ servicio.get_tipo_display|urlencode }})%20en%20{{ servicio.lugar|urlencode }}.%20%C2%BFDisponibilidad%20y%20detalles%3F"
+           target="_blank" rel="noopener"
+           class="mt-5 flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3.5 font-semibold text-white hover:brightness-95 transition">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg>
+          Reservar por WhatsApp
+        </a>
+        {% endif %}
+        <p class="mt-3 text-center coord text-niebla">Respuesta directa del operador</p>
+        {% endif %}
+
+        <div class="mt-5 pt-5 border-t border-concha space-y-2.5 text-sm">
+          <div class="flex justify-between"><span class="text-niebla">Tipo</span><span class="font-medium">{{ servicio.get_tipo_display }}</span></div>
+          <div class="flex justify-between"><span class="text-niebla">Lugar</span><span class="font-medium text-right">{{ servicio.lugar }}</span></div>
+          {% if servicio.capacidad %}<div class="flex justify-between"><span class="text-niebla">Capacidad</span><span class="font-medium">{{ servicio.capacidad }} pers.</span></div>{% endif %}
+        </div>
+      </div>
+
+      {% if redes %}
+      <div class="mt-4 rounded-2xl bg-mar p-5 text-white">
+        <p class="eyebrow text-turquesa-300 mb-3">Síguenos</p>
+        {% include "partials/redes.html" %}
+      </div>
+      {% endif %}
+    </aside>
+  </section>
+
+  <!-- ====== Lightbox ====== -->
+  {% if imagenes %}
+  <div x-show="lightbox" x-cloak @keydown.window.escape="cerrar()" @keydown.window.arrow-right="siguiente()" @keydown.window.arrow-left="anterior()"
+       class="fixed inset-0 z-50 bg-carbon/95 flex items-center justify-center" role="dialog" aria-modal="true" aria-label="Galería de imágenes" x-transition.opacity>
+    <button @click="cerrar()" class="absolute top-4 right-4 grid place-items-center h-11 w-11 rounded-full bg-white/10 text-white hover:bg-white/20" aria-label="Cerrar galería">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <button @click="anterior()" class="absolute left-3 sm:left-6 grid place-items-center h-11 w-11 rounded-full bg-white/10 text-white hover:bg-white/20" aria-label="Imagen anterior">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M15 6l-6 6 6 6"/></svg>
+    </button>
+    <figure class="max-w-5xl w-full px-4 text-center">
+      <template x-for="(img, i) in imagenes" :key="i">
+        <img x-show="i === actual" :src="img.url" :alt="img.alt" class="mx-auto max-h-[80vh] w-auto rounded-lg object-contain">
+      </template>
+      <figcaption class="mt-3 coord text-white/70" x-text="(actual + 1) + ' / ' + imagenes.length"></figcaption>
+    </figure>
+    <button @click="siguiente()" class="absolute right-3 sm:right-6 grid place-items-center h-11 w-11 rounded-full bg-white/10 text-white hover:bg-white/20" aria-label="Imagen siguiente">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+  {% endif %}
+
+  <!-- Datos de imágenes para el lightbox -->
+  <script type="application/json" id="datos-galeria">
+    [{% for img in imagenes %}{"url":"{{ img.url|escapejs }}","alt":"{{ img.titulo|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]
+  </script>
+</div>
+
+<!-- ====== Relacionados ====== -->
+{% if relacionados %}
+<section class="bg-white border-t border-concha">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14">
+    <h2 class="font-display text-2xl font-bold text-mar mb-8">También te puede gustar</h2>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {% for servicio in relacionados %}{% include "partials/tarjeta.html" %}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endwith %}
+
+<script>
+  function galeria(total) {
+    return {
+      imagenes: JSON.parse(document.getElementById('datos-galeria').textContent),
+      lightbox: false,
+      actual: 0,
+      abrir(i) { this.actual = i; this.lightbox = true; document.body.style.overflow = 'hidden'; },
+      cerrar() { this.lightbox = false; document.body.style.overflow = ''; },
+      siguiente() { if (this.imagenes.length) this.actual = (this.actual + 1) % this.imagenes.length; },
+      anterior() { if (this.imagenes.length) this.actual = (this.actual - 1 + this.imagenes.length) % this.imagenes.length; },
+    };
+  }
+</script>
+{% endblock %}

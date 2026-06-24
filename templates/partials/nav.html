@@ -1,0 +1,54 @@
+{% load static %}
+<header x-data="{ abierto: false, scrolled: false }"
+        @scroll.window="scrolled = window.scrollY > 24"
+        class="sticky top-0 z-30 transition-colors duration-300"
+        :class="scrolled ? 'bg-arena/90 backdrop-blur border-b border-concha' : 'bg-transparent'">
+  <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Principal">
+    <div class="flex items-center justify-between h-16 lg:h-20">
+
+      <a href="{% url 'home' %}" class="flex items-center gap-2.5 group">
+        {% if sitio.logo_url %}
+          <img src="{{ sitio.logo_url }}" alt="" class="h-9 w-9 rounded-lg object-cover">
+        {% else %}
+          <span class="grid place-items-center h-9 w-9 rounded-lg bg-mar text-turquesa-300" aria-hidden="true">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a6 6 0 0 0 6-3 6 6 0 0 0 12 0 6 6 0 0 0 2 3"/><path d="M4 18 2.3 9.8a1 1 0 0 1 .7-1.2L12 6l9 2.6a1 1 0 0 1 .7 1.2L20 18"/><path d="M12 2v4"/></svg>
+          </span>
+        {% endif %}
+        <span class="font-display font-extrabold text-lg tracking-tight text-carbon">{{ sitio.nombre_sitio }}</span>
+      </a>
+
+      <div class="hidden md:flex items-center gap-8">
+        <a href="{% url 'home' %}" class="text-sm font-medium text-carbon hover:text-turquesa transition-colors">Inicio</a>
+        <a href="{% url 'servicios:lista' %}?tipo=hotel" class="text-sm font-medium text-carbon hover:text-turquesa transition-colors">Hoteles</a>
+        <a href="{% url 'servicios:lista' %}?tipo=lancha" class="text-sm font-medium text-carbon hover:text-turquesa transition-colors">Lanchas y tours</a>
+        <a href="{% url 'nosotros' %}" class="text-sm font-medium text-carbon hover:text-turquesa transition-colors">Nosotros</a>
+        {% if sitio.telefono_whatsapp %}
+        <a href="{{ sitio.whatsapp_link }}" target="_blank" rel="noopener"
+           class="inline-flex items-center gap-2 rounded-full bg-sol px-5 py-2.5 text-sm font-semibold text-white hover:bg-sol-600 transition-colors">
+          Reservar
+        </a>
+        {% endif %}
+      </div>
+
+      <button @click="abierto = !abierto" class="md:hidden grid place-items-center h-10 w-10 rounded-lg text-carbon hover:bg-concha/60"
+              :aria-expanded="abierto" aria-controls="menu-movil" aria-label="Abrir menú">
+        <svg x-show="!abierto" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg x-show="abierto" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+
+    <!-- Menú móvil -->
+    <div id="menu-movil" x-show="abierto" x-cloak x-transition.opacity
+         @click.outside="abierto = false"
+         class="md:hidden pb-4 space-y-1">
+      <a href="{% url 'home' %}" class="block rounded-lg px-3 py-2.5 text-base font-medium hover:bg-concha/60">Inicio</a>
+      <a href="{% url 'servicios:lista' %}?tipo=hotel" class="block rounded-lg px-3 py-2.5 text-base font-medium hover:bg-concha/60">Hoteles</a>
+      <a href="{% url 'servicios:lista' %}?tipo=lancha" class="block rounded-lg px-3 py-2.5 text-base font-medium hover:bg-concha/60">Lanchas y tours</a>
+      <a href="{% url 'nosotros' %}" class="block rounded-lg px-3 py-2.5 text-base font-medium hover:bg-concha/60">Nosotros</a>
+      {% if sitio.telefono_whatsapp %}
+      <a href="{{ sitio.whatsapp_link }}" target="_blank" rel="noopener" class="block rounded-lg bg-sol px-3 py-2.5 text-base font-semibold text-white text-center mt-2">Reservar por WhatsApp</a>
+      {% endif %}
+    </div>
+  </nav>
+</header>
+<style>[x-cloak]{display:none!important;}</style>

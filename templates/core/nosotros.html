@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16">
+  <p class="eyebrow">Sobre nosotros</p>
+  <h1 class="mt-2 font-display text-4xl font-extrabold text-mar">Tolú, contado por quienes viven del mar</h1>
+  <div class="horizonte my-8"></div>
+  <div class="space-y-5 text-lg text-carbon/90 leading-relaxed">
+    <p>Somos una plataforma que reúne a hoteles y lancheros de Santiago de Tolú, en el Golfo de Morrosquillo. Nuestro propósito es simple: que encuentres dónde quedarte y qué pasear, y que reserves directo con quien presta el servicio.</p>
+    <p>Desde el muelle salen las lanchas hacia las Islas de San Bernardo, el Islote de Santa Cruz y los manglares cercanos. En tierra, los hoteles costeros te reciben a pocos pasos de la playa. Aquí los ves todos en un mismo lugar, con fotos, videos, precios y punto de partida claros.</p>
+    <p>No cobramos comisiones ocultas ni te pasamos por un call center: cada contacto va directo al operador por WhatsApp.</p>
+  </div>
+
+  <div class="mt-10 grid gap-5 sm:grid-cols-3 text-center">
+    <div class="rounded-2xl bg-white border border-concha p-6">
+      <p class="font-mono text-3xl font-bold text-sol-600">100%</p>
+      <p class="coord text-niebla mt-1">operadores locales</p>
+    </div>
+    <div class="rounded-2xl bg-white border border-concha p-6">
+      <p class="font-mono text-3xl font-bold text-sol-600">0</p>
+      <p class="coord text-niebla mt-1">comisiones ocultas</p>
+    </div>
+    <div class="rounded-2xl bg-white border border-concha p-6">
+      <p class="font-mono text-3xl font-bold text-sol-600">24/7</p>
+      <p class="coord text-niebla mt-1">contacto por WhatsApp</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

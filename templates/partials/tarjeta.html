@@ -1,0 +1,46 @@
+{% load servicios_extras %}
+{% comment %}Tarjeta de servicio. Espera la variable `servicio`.{% endcomment %}
+<article class="group flex flex-col overflow-hidden rounded-2xl bg-white border border-concha/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+  <a href="{{ servicio.get_absolute_url }}" class="relative block aspect-[4/3] overflow-hidden bg-concha">
+    {% with portada=servicio.portada %}
+      {% if portada %}
+        <img src="{{ portada.url }}" alt="{{ portada.titulo }}" loading="lazy"
+             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+      {% else %}
+        <div class="h-full w-full grid place-items-center text-niebla" aria-hidden="true">
+          <svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.16-5.16a2.25 2.25 0 013.18 0l5.16 5.16m-1.5-1.5l1.41-1.41a2.25 2.25 0 013.18 0l2.16 2.16M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15A2.25 2.25 0 002.25 6.75v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+        </div>
+      {% endif %}
+    {% endwith %}
+    <span class="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur px-3 py-1 text-xs font-semibold text-mar">
+      {% if servicio.tipo == 'hotel' %}
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 7h-8v6H3V5H1v15h2v-3h18v3h2v-9a4 4 0 00-4-4zM7 13a3 3 0 100-6 3 3 0 000 6z"/></svg> Hotel
+      {% else %}
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v-2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.89-6.68a1 1 0 00-.72-1.25L21 11V6c0-1.1-.9-2-2-2h-3V1H8v3H5c-1.1 0-2 .9-2 2v5l-.21.07a1 1 0 00-.72 1.25L3.95 19zM6 6h12v4.97L12 9 6 10.97V6z"/></svg> Lancha
+      {% endif %}
+    </span>
+  </a>
+
+  <div class="flex flex-1 flex-col p-5">
+    <p class="coord text-niebla mb-1.5">{{ servicio.lugar }}</p>
+    <h3 class="font-display text-lg font-bold leading-snug">
+      <a href="{{ servicio.get_absolute_url }}" class="hover:text-turquesa transition-colors">{{ servicio.nombre }}</a>
+    </h3>
+    <p class="mt-1.5 text-sm text-niebla line-clamp-2">{{ servicio.descripcion_corta }}</p>
+
+    <div class="mt-4 pt-4 border-t border-concha flex items-end justify-between">
+      <div>
+        {% if servicio.precio_a_consultar %}
+          <span class="font-mono text-base font-bold text-sol-600">Precio a consultar</span>
+          <span class="block coord text-niebla">Escríbenos por WhatsApp</span>
+        {% else %}
+          <span class="font-mono text-xl font-bold text-mar">{{ servicio.precio|pesos }}</span>
+          <span class="block coord text-niebla">{{ servicio.get_unidad_precio_display }}</span>
+        {% endif %}
+      </div>
+      <span class="inline-flex items-center gap-1 text-sm font-semibold text-sol-600 group-hover:gap-2 transition-all">
+        Ver <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M5 12h14m-6-6l6 6-6 6"/></svg>
+      </span>
+    </div>
+  </div>
+</article>

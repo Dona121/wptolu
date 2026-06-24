@@ -1,0 +1,44 @@
+{% load static %}
+<footer class="bg-mar-900 text-white">
+  <!-- Horizonte: línea firma que separa el contenido del footer -->
+  <div class="relative">
+    <svg class="w-full h-12 -mb-px text-mar-900" viewBox="0 0 1440 48" preserveAspectRatio="none" aria-hidden="true">
+      <path fill="currentColor" d="M0 24c180-24 360-24 540 0s360 24 540 0 270-18 360-12V48H0z"/>
+    </svg>
+  </div>
+
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14">
+    <div class="grid gap-10 md:grid-cols-4">
+      <div class="md:col-span-2">
+        <p class="font-display text-2xl font-extrabold">{{ sitio.nombre_sitio }}</p>
+        {% if sitio.eslogan %}<p class="mt-2 text-white/70 max-w-sm">{{ sitio.eslogan }}</p>{% endif %}
+        <p class="coord mt-5 text-turquesa-300">09.5237°N · 75.5816°O · GOLFO DE MORROSQUILLO</p>
+      </div>
+
+      <div>
+        <p class="eyebrow mb-4">Explora</p>
+        <ul class="space-y-2.5 text-sm text-white/80">
+          <li><a href="{% url 'servicios:lista' %}?tipo=hotel" class="hover:text-sol transition-colors">Hoteles</a></li>
+          <li><a href="{% url 'servicios:lista' %}?tipo=lancha" class="hover:text-sol transition-colors">Lanchas y tours</a></li>
+          <li><a href="{% url 'servicios:lista' %}" class="hover:text-sol transition-colors">Todo el catálogo</a></li>
+          <li><a href="{% url 'nosotros' %}" class="hover:text-sol transition-colors">Nosotros</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="eyebrow mb-4">Contacto</p>
+        <ul class="space-y-2.5 text-sm text-white/80">
+          {% if sitio.telefono_whatsapp %}<li><a href="{{ sitio.whatsapp_link }}" target="_blank" rel="noopener" class="hover:text-sol transition-colors">WhatsApp: {{ sitio.telefono_whatsapp }}</a></li>{% endif %}
+          {% if sitio.email %}<li><a href="mailto:{{ sitio.email }}" class="hover:text-sol transition-colors">{{ sitio.email }}</a></li>{% endif %}
+          {% if sitio.direccion %}<li>{{ sitio.direccion }}</li>{% endif %}
+        </ul>
+        {% if redes %}<div class="mt-5">{% include "partials/redes.html" %}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/50">
+      <p>© {% now "Y" %} {{ sitio.nombre_sitio }}. Santiago de Tolú, Sucre.</p>
+      <p class="coord">Hecho en la costa caribe colombiana</p>
+    </div>
+  </div>
+</footer>

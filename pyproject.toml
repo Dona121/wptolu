@@ -1,0 +1,16 @@
+[project]
+name = "lanhottolu"
+version = "0.1.0"
+description = "Plataforma de hoteles y lanchas/tours en Santiago de Tolú (Sucre)"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "django>=6.0.6",
+    "django-unfold>=0.98.0",
+    "dj-database-url>=3.1.2",
+    "gunicorn>=25.3.0",
+    "openpyxl>=3.1.5",
+    "psycopg[binary]>=3.3.4",
+    "python-dotenv>=1.2.2",
+    "whitenoise>=6.12.0",
+]
